@@ -42,11 +42,17 @@ public class ClerkJwtAuthFilter extends OncePerRequestFilter {
 	private ConfigurableJWTProcessor<SecurityContext> jwtProcessor;
 
 	@PostConstruct
-	public void init() throws Exception {
-		jwtProcessor = new DefaultJWTProcessor<>();
-		JWKSource<SecurityContext> keySource = new RemoteJWKSet<>(new URL(jwksUrl));
-		JWSKeySelector<SecurityContext> keySelector = new JWSVerificationKeySelector<>(JWSAlgorithm.RS256, keySource);
-		jwtProcessor.setJWSKeySelector(keySelector);
+	public void init() {
+		try {
+
+			jwtProcessor = new DefaultJWTProcessor<>();
+			JWKSource<SecurityContext> keySource = new RemoteJWKSet<>(new URL(jwksUrl));
+			JWSKeySelector<SecurityContext> keySelector = new JWSVerificationKeySelector<>(JWSAlgorithm.RS256,
+					keySource);
+			jwtProcessor.setJWSKeySelector(keySelector);
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to initialize JWT processor", e);
+		}
 	}
 
 	@Override
