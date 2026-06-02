@@ -1,7 +1,5 @@
 package com.ashish.mockmate.services.impl;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;

@@ -39,7 +39,7 @@ public class SecurityConfig {
 						.requestMatchers("/actuator/health").permitAll().requestMatchers("/actuator/info").permitAll()
 						// Webhook for Clerk (sync user on sign-up)
 						.requestMatchers("/webhooks/**").permitAll()
-						// All other endpoints require auth
+						// All other endpoints require authentication
 						.anyRequest().authenticated())
 				.addFilterBefore(clerkJwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 

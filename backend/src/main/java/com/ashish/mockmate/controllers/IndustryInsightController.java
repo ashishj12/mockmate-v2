@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@RequestMapping("/v1/industry-insights")
+@RequestMapping("/industry-insights")
 @RequiredArgsConstructor
 public class IndustryInsightController {
 

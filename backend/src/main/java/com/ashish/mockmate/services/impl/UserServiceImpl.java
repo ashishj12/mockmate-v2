@@ -36,40 +36,39 @@ public class UserServiceImpl implements UserService {
 					return EntityMapper.toUserResponse(saved);
 				});
 	}
-	
-	 @Override
-	    @Transactional
-	    public UserResponse updateProfile(ClerkPrincipal principal, OnboardingRequest request) {
-	        User user = userRepository.findByClerkUserId(principal.getClerkUserId())
-	                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-	 
-	        user.setIndustry(request.getIndustry());
-	        if (request.getBio() != null) user.setBio(request.getBio());
-	        if (request.getExperience() != null) user.setExperience(request.getExperience());
-	        if (request.getSkills() != null) {
-	            user.setSkills(request.getSkills().toArray(new String[0]));
-	        }
-	 
-	        User saved = userRepository.save(user);
-	        log.info("Updated profile for user: {}", saved.getId());
-	        return EntityMapper.toUserResponse(saved);
-	    }
-	 
-	    @Override
-	    @Transactional(readOnly = true)
-	    public UserResponse getProfile(ClerkPrincipal principal) {
-	        User user = userRepository.findByClerkUserId(principal.getClerkUserId())
-	                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-	        return EntityMapper.toUserResponse(user);
-	    }
-	 
-	    @Override
-	    @Transactional(readOnly = true)
-	    public boolean isOnboarded(ClerkPrincipal principal) {
-	        return userRepository.findByClerkUserId(principal.getClerkUserId())
-	                .map(u -> u.getIndustry() != null && !u.getIndustry().isBlank())
-	                .orElse(false);
-	    }
+
+	@Override
+	@Transactional
+	public UserResponse updateProfile(ClerkPrincipal principal, OnboardingRequest request) {
+		User user = userRepository.findByClerkUserId(principal.getClerkUserId())
+				.orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+		user.setIndustry(request.getIndustry());
+		if (request.getBio() != null)
+			user.setBio(request.getBio());
+		if (request.getExperience() != null)
+			user.setExperience(request.getExperience());
+		if (request.getSkills() != null) {
+			user.setSkills(request.getSkills().toArray(new String[0]));
+		}
+
+		User saved = userRepository.save(user);
+		log.info("Updated profile for user: {}", saved.getId());
+		return EntityMapper.toUserResponse(saved);
 	}
 
+	@Override
+	@Transactional(readOnly = true)
+	public UserResponse getProfile(ClerkPrincipal principal) {
+		User user = userRepository.findByClerkUserId(principal.getClerkUserId())
+				.orElseThrow(() -> new ResourceNotFoundException("User not found"));
+		return EntityMapper.toUserResponse(user);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public boolean isOnboarded(ClerkPrincipal principal) {
+		return userRepository.findByClerkUserId(principal.getClerkUserId())
+				.map(u -> u.getIndustry() != null && !u.getIndustry().isBlank()).orElse(false);
+	}
 }

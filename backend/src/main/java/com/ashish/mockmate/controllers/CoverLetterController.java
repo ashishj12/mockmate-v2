@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@RequestMapping("/v1/cover-letters")
+@RequestMapping("/cover-letters")
 @RequiredArgsConstructor
 public class CoverLetterController {
 

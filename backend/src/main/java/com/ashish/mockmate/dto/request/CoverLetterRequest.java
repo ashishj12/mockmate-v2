@@ -9,6 +9,7 @@ public class CoverLetterRequest {
 	private String companyName;
 
 	@NotBlank(message = "Job titile is required")
+	private String jobTitle;
 
 	private String jobDescription;
 }
