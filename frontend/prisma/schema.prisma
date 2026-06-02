@@ -1,0 +1,141 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String           @id @default(uuid())
+  clerkUserId     String           @unique
+  email           String           @unique
+  name            String?
+  imageUrl        String?
+  industry        String?
+  industryInsight IndustryInsight? @relation(fields: [industry], references: [industry])
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  //profile fileds
+  bio        String?
+  experience Int?
+  skills     String[]
+
+  assessments Assessment[]
+  resume      Resume[]
+  coverLetter CoverLetter[]
+}
+
+model Assessment {
+  id             String   @id @default(uuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  quizScore      Float //overall quizscore
+  questions      Json[] //array of question{question, answer,userAnswer, isCorrect}
+  category       String //technical behavioral
+  improvementTip String? //ai tips
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Resume {
+  id      String @id @default(uuid())
+  userId  String @unique
+  user    User   @relation(fields: [userId], references: [id])
+  content String @db.Text //markdown content
+
+  // ATS Analysis fields
+  atsAnalysis AtsAnalysis?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AtsAnalysis {
+  id       String @id @default(cuid())
+  resumeId String @unique
+  resume   Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+
+  // ATS Score and Analysis
+  overallScore      Int // 0-100
+  keywordMatchScore Int // 0-100  
+  formatScore       Int // 0-100
+  skillsScore       Int // 0-100
+  experienceScore   Int // 0-100
+
+  // Matched and Missing Keywords
+  matchedKeywords String[]
+  missingKeywords String[]
+
+  // Job Description used for analysis
+  jobDescription String  @db.Text
+  jobTitle       String?
+  companyName    String?
+
+  // Improvements and Suggestions
+  improvements Json[] // Array of improvement objects
+  suggestions  Json[] // Array of suggestion objects
+
+  // Analysis metadata
+  totalKeywords Int
+  matchedCount  Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([resumeId])
+}
+
+model CoverLetter {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  content        String // Markdown content
+  jobDescription String?
+  companyName    String // Name of the company applying to
+  jobTitle       String // Position applying for
+  status         String   @default("draft") // draft, completed
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model IndustryInsight {
+  id       String @id @default(cuid())
+  industry String @unique
+
+  // Users in this industry
+  users User[]
+
+  // Salary data
+  salaryRanges Json[]
+
+  // Industry trends
+  growthRate  Float // Industry growth rate
+  demandLevel String // "High", "Medium", "Low"
+  topSkills   String[] // Most in-demand skills
+
+  // Market conditions
+  marketOutlook String //  pos, neg and neutral
+  keyTrends     String[] // Array of current industry trends
+
+  // Learning suggestions
+  recommendedSkills String[] // Skills recommended for the industry
+
+  lastUpdated DateTime @default(now())
+  nextUpdate  DateTime // Scheduled update time
+
+  @@index([industry])
+}

@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  mockmate-app:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+        CLERK_PUBLISHABLE_KEY: ${CLERK_PUBLISHABLE_KEY}
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/mockmate
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+      CLERK_PUBLISHABLE_KEY: ${CLERK_PUBLISHABLE_KEY}
+    command: sh -c "npx prisma migrate deploy && npm start"
+
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mockmate
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  inngest-dev-server:
+    image: node:18-alpine
+    working_dir: /app
+    volumes:
+      - .:/app
+    entrypoint: ["npx", "inngest-cli@latest", "dev"]
+    ports:
+      - "8288:8288"
+    depends_on:
+      - mockmate-app
+
+volumes:
+  pgdata:
